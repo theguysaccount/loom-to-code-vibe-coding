@@ -18,9 +18,10 @@ recurring job. Nothing needs a person for it to keep working.
 
 Every job is safe to re-run: nothing is appended or counted, and a deploy of the same commit is identical.
 
-**Temporary line to remove:** `selftest.yml` has a third cron, `13,43 * 22-24 11 *`, added on
-2026-11-22 to prove the schedule trigger. It can only fire on 22 to 24 November. Delete it once a
-schedule-triggered run has passed (it would come back on the same dates next year).
+**Schedule trigger verified:** the first schedule-triggered self-test passed on 2026-11-22
+([run 45047476537](https://github.com/theguysaccount/loom-to-code-vibe-coding/actions/runs/45047476537)), from a temporary cron limited to
+22 to 24 November that was then removed. New or edited crons on this account have taken about 8 hours to
+fire for the first time, so don't read a quiet first day as a broken schedule.
 
 ## What to watch
 
