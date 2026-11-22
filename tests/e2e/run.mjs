@@ -100,7 +100,15 @@ async function launch() {
     const exited = new Promise((r) => chrome.once("exit", r));
     chrome.kill();
     await exited;
-    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    // Chrome's helper processes can still be writing for a moment after it exits (seen on Linux).
+    for (let i = 0; i < 5; i++) {
+      try {
+        fs.rmSync(profile, { recursive: true, force: true });
+        break;
+      } catch {
+        await new Promise((r) => setTimeout(r, 400));
+      }
+    }
   };
   return { send, listeners, close };
 }
