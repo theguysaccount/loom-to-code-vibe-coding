@@ -3,7 +3,7 @@
 Machine-driven: no posts, outreach or ads. Distribution runs through the channels below.
 
 ## Live
-- Site: https://theguysaccount.github.io/loom-to-code-vibe-coding/ (home, demo, 5 docs pages, 3 guides)
+- Site: https://code.screenrecordit.com/ (home, demo, 5 docs pages, 3 guides; the github.io address redirects there)
 - Repo with Claude Code and Cursor marketplace manifests: https://github.com/theguysaccount/loom-to-code-vibe-coding
 - Pinned script: https://cdn.jsdelivr.net/gh/theguysaccount/loom-to-code-vibe-coding@v0.1.0/plugin/toolbar/pointbrief.js
 

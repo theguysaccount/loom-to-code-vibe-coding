@@ -3,7 +3,8 @@
 Pointbrief runs itself on GitHub: Pages hosts the site and the toolbar script, Actions runs every
 recurring job. Nothing needs a person for it to keep working.
 
-**Live:** https://theguysaccount.github.io/loom-to-code-vibe-coding/
+**Live:** https://code.screenrecordit.com/ (custom domain since 2026-11-22; the old address
+https://theguysaccount.github.io/loom-to-code-vibe-coding/ redirects to it)
 **Repo:** https://github.com/theguysaccount/loom-to-code-vibe-coding
 **Install (Claude Code):** `/plugin marketplace add theguysaccount/loom-to-code-vibe-coding`, then `/plugin install pointbrief@pointbrief`
 
@@ -37,8 +38,8 @@ fire for the first time, so don't read a quiet first day as a broken schedule.
 ```bash
 node --test tests/unit/*.test.mjs
 node scripts/build.mjs && node tests/e2e/run.mjs
-node tests/e2e/run.mjs https://theguysaccount.github.io/loom-to-code-vibe-coding --frameworks
-node scripts/check-live.mjs https://theguysaccount.github.io/loom-to-code-vibe-coding
+node tests/e2e/run.mjs https://code.screenrecordit.com --frameworks
+node scripts/check-live.mjs https://code.screenrecordit.com
 ~/.local/bin/gh workflow run pages.yml -R theguysaccount/loom-to-code-vibe-coding
 ~/.local/bin/gh workflow run selftest.yml -R theguysaccount/loom-to-code-vibe-coding
 ```
@@ -56,17 +57,21 @@ node scripts/check-live.mjs https://theguysaccount.github.io/loom-to-code-vibe-c
 
 Nothing below is needed for Pointbrief to work.
 
-### 1. Custom domain: screenrecordit.com
+### 1. Custom domain: done, code.screenrecordit.com
 
-The prompt names `screenrecordit.com` (in the 2026-08-30 portfolio) as this idea's domain. The
-"domain rollout" session puts finished sites on their domains; this repo doesn't touch DNS.
+**Turned on 2026-11-22 by the "domain rollout" session** (recorded in `~/code/DOMAIN_ROLLOUT.md`):
+screenrecordit.com already serves a different tool (ScreenRecordIt, on Vercel), so the site took the
+`code` subdomain: Namecheap `CNAME code → theguysaccount.github.io.`, Pages custom domain
+`code.screenrecordit.com` with HTTPS enforced, and `SITE_URL=https://code.screenrecordit.com`. The deploy
+and the scheduled self-test have passed on it. This repo changes no DNS.
 
-The site's base URL is **one setting**: the repository variable `SITE_URL`. Steps:
+The site's base URL is **one setting**: the repository variable `SITE_URL`. To move the site to another
+domain later (the steps below use the apex as the example):
 
 1. DNS for `screenrecordit.com` (Namecheap → Advanced DNS): `A @` → `185.199.108.153`, `185.199.109.153`,
    `185.199.110.153`, `185.199.111.153`; `AAAA @` → `2606:50c0:8000::153`, `2606:50c0:8001::153`,
    `2606:50c0:8002::153`, `2606:50c0:8003::153`; `CNAME www` → `theguysaccount.github.io`.
-   Check first that nothing else is live on the domain.
+   Check first that nothing else is live on the domain, and never replace a record that serves something.
 2. Set the Pages custom domain: `gh api -X PUT repos/theguysaccount/loom-to-code-vibe-coding/pages -f cname=screenrecordit.com`
    (or Settings → Pages → Custom domain). When the certificate is issued, tick **Enforce HTTPS**
    (`gh api -X PUT repos/theguysaccount/loom-to-code-vibe-coding/pages -F https_enforced=true`).

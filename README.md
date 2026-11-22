@@ -8,7 +8,7 @@ Pointbrief records *events*, not video, so every sentence is tied to the exact e
 at: its selector, text, current styles, and in React, Vue and Svelte dev builds, the component and source
 file. Press **Done** and you get a numbered change list that Claude Code, Cursor or any agent can apply.
 
-**Try it:** https://theguysaccount.github.io/loom-to-code-vibe-coding/demo/ (runs in your browser, nothing uploaded)
+**Try it:** https://code.screenrecordit.com/demo/ (runs in your browser, nothing uploaded)
 
 ![The brief after a sample recording on the demo app](docs/screens/demo-brief-desktop.png)
 
