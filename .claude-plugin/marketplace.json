@@ -1,0 +1,17 @@
+{
+  "name": "pointbrief",
+  "description": "Pointbrief: point-and-talk UI feedback for coding agents. A dev toolbar for your local app plus a Claude Code plugin that applies the brief.",
+  "owner": {
+    "name": "Pointbrief contributors",
+    "url": "https://github.com/theguysaccount/loom-to-code-vibe-coding"
+  },
+  "plugins": [
+    {
+      "name": "pointbrief",
+      "source": "./plugin",
+      "description": "Point at your running app, say what to change, and draw on it. Pointbrief turns that into an element-mapped brief this agent applies, then shows you the diff.",
+      "category": "development",
+      "tags": ["ui-feedback", "frontend", "voice", "mcp"]
+    }
+  ]
+}

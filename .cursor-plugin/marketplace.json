@@ -1,0 +1,16 @@
+{
+  "name": "pointbrief",
+  "owner": {
+    "name": "Pointbrief contributors"
+  },
+  "metadata": {
+    "description": "Pointbrief: point-and-talk UI feedback for coding agents."
+  },
+  "plugins": [
+    {
+      "name": "pointbrief",
+      "source": "plugin",
+      "description": "Point at your running app, say what to change, and draw on it. Pointbrief turns that into an element-mapped brief the agent applies."
+    }
+  ]
+}

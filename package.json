@@ -1,0 +1,8 @@
+{
+  "name": "pointbrief",
+  "version": "0.1.0",
+  "description": "Point, talk and draw on your running app; get an element-mapped brief your coding agent can apply.",
+  "type": "module",
+  "license": "MIT",
+  "private": true
+}

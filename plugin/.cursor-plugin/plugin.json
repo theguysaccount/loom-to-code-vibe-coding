@@ -1,0 +1,13 @@
+{
+  "name": "pointbrief",
+  "displayName": "Pointbrief",
+  "version": "0.1.0",
+  "description": "Point at your running app, say what to change, and draw on it. Pointbrief turns that into an element-mapped brief the agent applies.",
+  "author": {
+    "name": "Pointbrief contributors"
+  },
+  "homepage": "https://theguysaccount.github.io/loom-to-code-vibe-coding/",
+  "repository": "https://github.com/theguysaccount/loom-to-code-vibe-coding",
+  "license": "MIT",
+  "keywords": ["ui-feedback", "visual-feedback", "voice", "vibe-coding", "frontend", "mcp"]
+}
