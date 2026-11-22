@@ -114,7 +114,7 @@ export function createDrawLayer({ canvas, recorder, onMark }) {
         if (el) ev = { type: "stroke", t0: lastLine.event.t0, t1, role: "cross", el: recorder.refFor(el), bbox: round(box) };
         lastLine = null;
       } else {
-        const flat = shape.horizontal ? lineRole(shape) : null;
+        const flat = shape.horizontal && !shape.head ? lineRole(shape) : null;
         if (flat) {
           ev = { type: "stroke", t0, t1, role: flat.role, el: recorder.refFor(flat.el), bbox: round(shape.bbox) };
         } else {

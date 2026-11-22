@@ -66,7 +66,7 @@ export function createToolbar(options = {}) {
       <canvas class="ink" aria-hidden="true"></canvas>
       <div class="hl" aria-hidden="true"><span></span></div>
       <div class="hl mark" aria-hidden="true"><span></span></div>
-      <div class="ghost" aria-hidden="true" hidden>${ICONS.hand}</div>
+      <div class="pb-cursor" aria-hidden="true" hidden>${ICONS.hand}</div>
       <section class="card" role="dialog" aria-modal="false" aria-labelledby="pb-card-title" hidden></section>
       <aside class="panel" role="dialog" aria-modal="false" aria-labelledby="pb-panel-title" hidden></aside>
       <div class="bar idle" role="toolbar" aria-label="Pointbrief"></div>
@@ -75,7 +75,7 @@ export function createToolbar(options = {}) {
   const $ = (sel) => shadow.querySelector(sel);
   const root = $(".root"), bar = $(".bar"), card = $(".card"), panel = $(".panel"), toast = $(".toast");
   const [hl, hlMark] = shadow.querySelectorAll(".hl");
-  const ghost = $(".ghost");
+  const ghost = $(".pb-cursor");
   (document.body || document.documentElement).appendChild(host);
   setOwnHost(host);
 
@@ -455,6 +455,7 @@ export function createToolbar(options = {}) {
         <p class="hint">Paste it into Claude Code, Cursor or any coding agent. It lists each change with the element's selector, text and source hints.</p>
       </footer>`;
     panel.hidden = false;
+    root.classList.add("reviewing");
     panel.querySelector("#pb-panel-title").focus({ preventScroll: true });
     panel.querySelectorAll("textarea").forEach(autosize);
     const send = panel.querySelector('[data-act="send"]');
@@ -482,6 +483,7 @@ export function createToolbar(options = {}) {
 
   function closeReview() {
     panel.hidden = true;
+    root.classList.remove("reviewing");
     hlMark.classList.remove("on");
     hl.classList.remove("on");
     draw.clear();
@@ -550,6 +552,7 @@ export function createToolbar(options = {}) {
     if (act === "dl-json") return downloadFile(`${brief.id || "pointbrief"}.json`, JSON.stringify(brief, null, 2), "application/json", shadow);
     if (act === "again") {
       panel.hidden = true;
+      root.classList.remove("reviewing");
       return begin();
     }
     if (act === "del") {
@@ -637,6 +640,7 @@ export function createToolbar(options = {}) {
   function begin() {
     if (state === "recording" || state === "finishing") return;
     panel.hidden = true;
+    root.classList.remove("reviewing");
     if (getItem("localStorage", CONSENT_KEY) === "1") return startRecording({ voice: opts.voice !== "off" });
     renderConsent();
   }

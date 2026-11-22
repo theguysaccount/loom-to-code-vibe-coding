@@ -232,6 +232,8 @@ export function findHints(text, gestureKinds = []) {
 // Put [1] [2] markers into the words where each target was pointed at.
 function markWords(item, targets) {
   if (targets.length < 2) return null;
+  // Targets from one gesture (an arrow's two ends) were referenced at the same moment: no markers.
+  if (new Set(targets.map((t) => t.t0)).size < targets.length) return null;
   const words = [];
   for (const u of item.utterances) {
     const parts = u.text.split(" ");

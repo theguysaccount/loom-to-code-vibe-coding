@@ -230,10 +230,15 @@ export function shortPath(file) {
   if (!file) return "";
   let p = String(file).replace(/\\/g, "/").replace(/^[a-z-]+:\/\/[^/]*\//i, "/").replace(/[?#].*$/, "");
   p = p.replace(/^.*\/node_modules\//, "node_modules/");
-  const m = p.match(/\/((?:src|app|pages|components|lib|routes|views|layouts|features|ui)\/.*)$/);
-  if (m) return m[1];
-  const parts = p.split("/").filter(Boolean);
-  return parts.slice(-3).join("/");
+  if (p.startsWith("node_modules/")) return p;
+  if (!p.startsWith("/")) p = `/${p}`;
+  // Prefer the first src/ (monorepos: packages/web/src/...); otherwise the last framework folder.
+  const src = p.indexOf("/src/");
+  if (src >= 0) return p.slice(src + 1);
+  let last = -1;
+  for (const m of p.matchAll(/\/(?=(?:app|pages|components|lib|routes|views|layouts|features|ui)\/)/g)) last = m.index;
+  if (last >= 0) return p.slice(last + 1);
+  return p.split("/").filter(Boolean).slice(-3).join("/");
 }
 
 function fiberOf(el) {

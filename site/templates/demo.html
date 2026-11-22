@@ -1,0 +1,53 @@
+<div class="demo-note" role="note"><div class="wrap">
+  <p><strong>This is a made-up app with a few things wrong with it.</strong> Press <strong>Record</strong> on the toolbar (bottom right), point at what you'd change and say it or type it. Switch to <strong>Mark</strong> to circle or cross things out. Then press <strong>Done</strong>.</p>
+  <p><button class="btn small primary" type="button" id="play-sample">Play a sample recording</button> <span class="hint">Takes about 30 seconds and uses the real capture code, with a scripted pointer and voice.</span></p>
+</div></div>
+
+<div class="tb-app" id="tinyboard" aria-label="Tinyboard demo app">
+  <div class="promo" id="promo"><strong>50% off</strong> all plans this week only</div>
+  <header class="tb-nav">
+    <a class="tb-logo" href="#tinyboard">Tinyboard</a>
+    <nav class="tb-links" aria-label="Demo app">
+      <a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#templates">Templates</a>
+    </nav>
+    <button class="tb-login" type="button">Log in</button>
+  </header>
+
+  <section class="tb-hero">
+    <h1 class="hero-title">Plan you week in minutes</h1>
+    <p class="hero-sub">Tinyboard keeps your tasks, notes and deadlines on one simple board.</p>
+    <button class="cta" id="start-trial" type="button">Start free trial</button>
+  </section>
+
+  <section class="tb-features" id="features">
+    <div class="feature"><h3>Boards</h3><p>Drag tasks between columns and see the week at a glance.</p></div>
+    <div class="feature"><h3>Notes</h3><p>Attach notes and checklists to any task.</p></div>
+    <div class="feature"><h3>Reminders</h3><p>Get a nudge the day before something is due.</p></div>
+  </section>
+
+  <section class="tb-pricing" id="pricing">
+    <h2 class="pricing-title">Pricing</h2>
+    <div class="plans">
+      <div class="plan"><h3>Free</h3><p class="price">$0</p><p>One board, three people.</p><button type="button" class="plan-btn">Choose Free</button></div>
+      <div class="plan featured"><h3>Pro</h3><p class="price">$8<span>/month</span></p><p>Unlimited boards and reminders.</p><button type="button" class="plan-btn">Choose Pro</button></div>
+      <div class="plan"><h3>Team</h3><p class="price">$15<span>/month</span></p><p>Shared boards and admin controls.</p><button type="button" class="plan-btn">Choose Team</button></div>
+    </div>
+  </section>
+
+  <section class="templates" id="templates">
+    <h2>Templates</h2>
+    <p>Start from a weekly plan, a sprint board or a study schedule.</p>
+  </section>
+
+  <footer class="tb-footer">
+    <nav class="footer-links" aria-label="Demo footer"><a href="#tinyboard">About</a><a href="#tinyboard">Blog</a><a href="#tinyboard">Privacy</a><a href="#tinyboard">Terms</a><a href="#tinyboard">Help</a></nav>
+    <p>Tinyboard is a fictional app made for this demo.</p>
+  </footer>
+</div>
+
+<section class="your-brief" id="your-brief" hidden aria-live="polite"><div class="wrap">
+  <h2>Your brief</h2>
+  <p>This is exactly what you'd paste into your coding agent. On your own app, the Claude Code plugin can receive it directly.</p>
+  <div class="row"><button class="btn small primary" type="button" id="copy-brief">Copy brief</button> <a class="btn small" href="{{base}}/#install">Install Pointbrief</a></div>
+  <pre class="no-copy" id="brief-out"></pre>
+</div></section>

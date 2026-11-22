@@ -19,15 +19,16 @@ export const CSS_TEXT = `
   padding: 4px 6px; border-radius: 4px; }
 .hl.low span { bottom: auto; top: 100%; margin: 2px 0 0; }
 
-.ghost { position: fixed; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; transform: translate(-100px, -100px);
+.pb-cursor { position: fixed; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; transform: translate(-100px, -100px);
   transition: transform .32s cubic-bezier(.3, .7, .3, 1); filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .45)); }
-.ghost svg { width: 26px; height: 26px; fill: #111; stroke: #fff; stroke-width: 1.6; }
-.ghost.fast { transition: none; }
+.pb-cursor svg { width: 26px; height: 26px; fill: #111; stroke: #fff; stroke-width: 1.6; }
+.pb-cursor.fast { transition: none; }
 .bar { position: fixed; right: 16px; bottom: 16px; pointer-events: auto; display: flex; flex-direction: column; gap: 8px;
   width: max-content; max-width: min(430px, calc(100vw - 24px)); padding: 8px; background: var(--bg); border: 1px solid var(--line);
   border-radius: 16px; box-shadow: 0 12px 34px rgba(0, 0, 0, .38), 0 1px 0 rgba(255, 255, 255, .04) inset; }
 .root.left .bar { right: auto; left: 16px; }
 .root.hidden .bar, .root.hidden .hl { display: none; }
+.root.reviewing .bar, .root.reviewing .card { display: none; }
 .row { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .brand { display: flex; align-items: center; gap: 7px; padding: 0 6px 0 4px; font-weight: 650; font-size: 13px; color: var(--text); white-space: nowrap; }
 .brand svg { color: var(--accent); }

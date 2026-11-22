@@ -89,6 +89,19 @@ test("an arrow whose head doubles back still points from start to tip", () => {
   const s = classifyStroke([...shaft, ...head]);
   assert.equal(s.shape, "line");
   assert.ok(s.end.x > 330 && s.end.y < 230, "tip is near the end of the shaft");
+  assert.equal(s.head, true);
+});
+
+test("a long horizontal arrow keeps its head, so it is never read as a strike-through", () => {
+  const shaft = line(100, 200, 900, 204, 1.2, 9, 60);
+  const head = [...line(900, 204, 884, 196, 1, 3, 4), ...line(884, 196, 900, 204, 1, 4, 4), ...line(900, 204, 884, 212, 1, 5, 4)];
+  const s = classifyStroke([...shaft, ...head]);
+  assert.equal(s.shape, "line");
+  assert.equal(s.horizontal, true);
+  assert.equal(s.head, true);
+  assert.ok(s.end.x > 880);
+  const plain = classifyStroke(line(100, 200, 900, 204, 1.2, 9, 60));
+  assert.equal(plain.head, false, "a plain straight stroke has no head");
 });
 
 test("zig-zags are scribbles", () => {

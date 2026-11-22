@@ -109,7 +109,9 @@ export function createPointerTracker({ recorder, onTarget }) {
     if (cur && cur.touch) close();
   }
 
-  function onLeave() {
+  // Only when the pointer leaves the window: pointerleave from inner elements must not end a span.
+  function onLeave(e) {
+    if (e.target !== document.documentElement) return;
     if (!held) close();
   }
 
@@ -122,7 +124,7 @@ export function createPointerTracker({ recorder, onTarget }) {
       window.addEventListener("pointerdown", onDown, opts);
       window.addEventListener("click", onClick, opts);
       window.addEventListener("scroll", onScroll, opts);
-      document.documentElement.addEventListener("pointerleave", onLeave, opts);
+      document.documentElement.addEventListener("pointerleave", onLeave);
       timer = setInterval(tick, 500);
     },
     stop() {
@@ -133,7 +135,7 @@ export function createPointerTracker({ recorder, onTarget }) {
       window.removeEventListener("pointerdown", onDown, opts);
       window.removeEventListener("click", onClick, opts);
       window.removeEventListener("scroll", onScroll, opts);
-      document.documentElement.removeEventListener("pointerleave", onLeave, opts);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
       clearInterval(timer);
     },
     // Close the open span now (before a stroke, a mode change or a page unload).

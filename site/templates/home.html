@@ -1,0 +1,90 @@
+<section class="hero"><div class="wrap">
+  <div>
+    <p class="eyebrow">Free and open source · works with Claude Code, Cursor or any agent</p>
+    <h1>Point at your app. <span>Say what to change.</span></h1>
+    <p class="lede">Pointbrief is a dev toolbar for your running app. Talk, point and draw on the page the way you would in a Loom, and it hands your coding agent a brief: every change you asked for, in your words, tied to the exact element, selector and source file.</p>
+    <div class="actions">
+      <a class="btn primary" href="{{base}}/demo/">Try it on a demo app</a>
+      <a class="btn" href="#install">Install</a>
+    </div>
+    <p class="small-print">No account. No video. Nothing uploaded: the brief stays in your browser until you copy it or send it to your local agent.</p>
+  </div>
+  <div class="brief-card" aria-label="An example brief">
+    <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <pre>{{example}}</pre>
+    <p class="caption">What the agent gets: a real brief built by the same code that runs in the toolbar. <a href="{{base}}/example-brief.md" style="color:#ffb39f">Full Markdown</a> · <a href="{{base}}/example-brief.json" style="color:#ffb39f">JSON</a></p>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="sub">Typing "the button on the right is too small" into a chat box makes the agent guess which button. Pointing at it doesn't.</p>
+  <div class="grid">
+    <div class="card"><span class="step-n">1</span><h3>Record over your app</h3><p>Press <strong>Record</strong> on the toolbar and use your app as usual. Talk the way you'd talk to a developer looking over your shoulder, or type notes.</p></div>
+    <div class="card"><span class="step-n">2</span><h3>Point and draw</h3><p>Hover or click what you mean. Switch to <strong>Mark</strong> to circle things, underline copy, cross out or scribble over what should go, or draw an arrow from where something is to where it belongs.</p></div>
+    <div class="card"><span class="step-n">3</span><h3>Hand it to your agent</h3><p>Press <strong>Done</strong>. Each thought becomes one item with your words and its targets. Copy it into any agent, or send it to Claude Code, which edits the code and shows you the diff before anything is committed.</p></div>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2>Why the brief is precise</h2>
+  <p class="sub">Agents can't watch a video. A brief gives them what a developer would work out from one.</p>
+  <div class="grid">
+    <div class="card"><h3>Mapped to elements</h3><p>Every target carries a short unique CSS selector, its visible text, role, current styles and position. In React, Vue and Svelte dev builds it also names the component and the source file, React 19 included.</p></div>
+    <div class="card"><h3>Words lined up with pointing</h3><p>"Make this bigger and this one blue" becomes "make this [1] bigger and this [2] one blue", with [1] and [2] pointing at the two elements you were on when you said them.</p></div>
+    <div class="card"><h3>Gestures mean something</h3><p>A circle marks a region; a strike-through, cross or scribble means remove; an underline usually means the wording; an arrow means move this there. A mark with no words still becomes an item.</p></div>
+    <div class="card"><h3>Emphasis becomes priority</h3><p>"Way too small", "really", repeating yourself or circling twice marks an item high priority, with the reason, so the agent does it first.</p></div>
+  </div>
+</div></section>
+
+<section class="band" id="install"><div class="wrap">
+  <h2>Install</h2>
+  <p class="sub">The toolbar is one script for your app in development. The plugin lets Claude Code receive briefs directly. Use either or both.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Claude Code</h3>
+      <p>In Claude Code, add the marketplace and install the plugin:</p>
+      <pre><code>/plugin marketplace add theguysaccount/loom-to-code-vibe-coding
+/plugin install pointbrief@pointbrief</code></pre>
+      <p>Then run <code>/pointbrief:setup</code> to add the toolbar to your app, and <code>/pointbrief:apply</code> after you send a brief. Needs Node.js 18+. <a href="{{base}}/docs/claude-code/">Details</a></p>
+    </div>
+    <div class="card">
+      <h3>Any web app</h3>
+      <p>Add the script to your app's HTML in development only:</p>
+      <pre><code>{{pinned}}</code></pre>
+      <p>Copy the brief and paste it into Cursor, Windsurf, Codex, Copilot or any chat. <a href="{{base}}/docs/">Options and frameworks</a></p>
+    </div>
+    <div class="card">
+      <h3>Bookmarklet</h3>
+      <p>Drag this to your bookmarks bar, then click it on any page you're working on:</p>
+      <p><a class="bookmarklet" href="{{bookmarklet}}">Pointbrief</a></p>
+      <p>Pages with a strict Content Security Policy block it; use the script tag there.</p>
+    </div>
+    <div class="card">
+      <h3>Cursor</h3>
+      <p>Import this repository as a plugin (it carries a Cursor marketplace manifest), or add the MCP server by hand. Pasting a copied brief works too. <a href="{{base}}/docs/cursor/">Cursor setup</a></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2>What stays on your machine</h2>
+  <ul class="tick">
+    <li>No screen video and no screenshots: the toolbar records events (what you pointed at, what you drew, what you said), not pixels.</li>
+    <li>It never reads form fields or passwords, and anything inside <code>data-pointbrief-private</code> is left out.</li>
+    <li>Voice is transcribed by your browser. Chrome does it on the device when it has the language pack; otherwise browsers use their own speech service, and the toolbar tells you which before you start. Prefer typing? Choose <strong>Type instead</strong>.</li>
+    <li>The brief leaves the page only when you copy it, download it, or send it to the plugin on <code>127.0.0.1</code>.</li>
+  </ul>
+  <p><a href="{{base}}/docs/privacy/">Privacy details</a></p>
+</div></section>
+
+<section class="band example"><div class="wrap">
+  <h2>A full example brief</h2>
+  <p class="sub">This is the Markdown an agent receives. The JSON version has the same content with every field typed (<a href="{{base}}/docs/brief-format/">brief format</a>).</p>
+  <pre class="no-copy"><code>{{example}}</code></pre>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2>Questions</h2>
+  {{faq}}
+</div></section>

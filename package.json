@@ -1,8 +1,21 @@
 {
   "name": "pointbrief",
   "version": "0.1.0",
-  "description": "Point, talk and draw on your running app; get an element-mapped brief your coding agent can apply.",
+  "description": "Point at your running app, say what to change, and draw on it: get an element-mapped brief your coding agent can apply.",
   "type": "module",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "homepage": "https://theguysaccount.github.io/loom-to-code-vibe-coding/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theguysaccount/loom-to-code-vibe-coding.git"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/unit/*.test.mjs",
+    "e2e": "node tests/e2e/run.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
 }

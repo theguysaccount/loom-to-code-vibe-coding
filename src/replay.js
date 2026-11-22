@@ -67,11 +67,25 @@ export function createPlayer({ toolbar, speed = 1, cursor = true }) {
     d.ghost.style.transform = `translate(${x - 4}px, ${y - 2}px)`;
   }
 
+  // Visible means the element's centre is really hit by the pointer: not off-screen, not under a
+  // sticky header, not behind the toolbar.
+  function reachable(el) {
+    const { x, y } = centre(el);
+    if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight - 130) return false;
+    const prev = d.canvas.style.pointerEvents;
+    d.canvas.style.pointerEvents = "none";
+    const hit = document.elementFromPoint(x, y);
+    d.canvas.style.pointerEvents = prev;
+    return !!hit && (hit === el || el.contains(hit));
+  }
+
   async function ensureVisible(el) {
-    const r = el.getBoundingClientRect();
-    if (r.top < 60 || r.bottom > window.innerHeight - 140) {
-      el.scrollIntoView({ block: "center", behavior: "instant" in document.documentElement.style ? "instant" : "auto" });
-      await wait(250);
+    if (reachable(el)) return;
+    el.scrollIntoView({ block: "center", inline: "nearest" });
+    await wait(250);
+    if (!reachable(el)) {
+      window.scrollBy(0, -Math.round(window.innerHeight / 4));
+      await wait(200);
     }
   }
 
@@ -198,6 +212,12 @@ export function createPlayer({ toolbar, speed = 1, cursor = true }) {
       }
       const input = d.noteInput();
       if (input) {
+        // Like a real mouse on its way to the note box: leave the page element, land on the toolbar.
+        const under = document.elementFromPoint(pos.x, pos.y);
+        if (under) under.dispatchEvent(new PointerEvent("pointerleave", { bubbles: false, composed: true, clientX: pos.x, clientY: pos.y, pointerType: "mouse" }));
+        const box = input.getBoundingClientRect();
+        fire(input, "pointermove", box.left + 12, box.top + 12, { buttons: 0 });
+        await wait(150);
         input.value = s.note.slice(0, 1);
         input.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
         await wait(Math.min(1400, s.note.length * 35));
@@ -215,6 +235,7 @@ export function createPlayer({ toolbar, speed = 1, cursor = true }) {
     }
     if (s.arrow) {
       const [a, b] = s.arrow.map(resolve);
+      await ensureVisible(a);
       return stroke(shapes.arrow(a, b), s.ms || 650);
     }
     throw new Error(`replay: unknown step ${JSON.stringify(s)}`);

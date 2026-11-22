@@ -90,7 +90,7 @@ export function classifyStroke(raw) {
   const length = pathLength(pts);
   const start = pts[0] || { x: 0, y: 0 };
   const end = pts[pts.length - 1] || start;
-  const base = { length, bbox: box, loops: 0, angle: 0, horizontal: false, start, end };
+  const base = { length, bbox: box, loops: 0, angle: 0, horizontal: false, head: false, start, end };
   if (pts.length < 3 || length < 14) return { shape: "dot", ...base };
 
   const diag = Math.max(Math.hypot(box.w, box.h), 1);
@@ -113,12 +113,14 @@ export function classifyStroke(raw) {
   const shaftLen = pathLength(pts.slice(0, far + 1));
   const headLen = length - shaftLen;
   const arrow = shaftLen >= 14 && farDist / shaftLen >= 0.92 && headLen <= shaftLen * 0.5;
+  // A head is a short stroke back from the tip: it says "arrow", never "strike-through".
+  const head = arrow && headLen >= Math.max(10, Math.min(40, shaftLen * 0.06));
 
   if (straight >= 0.9 || arrow) {
-    const tip = straight >= 0.9 ? end : pts[far];
+    const tip = head || straight < 0.9 ? pts[far] : end;
     const angle = Math.atan2(tip.y - start.y, tip.x - start.x);
     const deg = Math.abs((angle * 180) / Math.PI);
-    return { shape: "line", ...base, end: tip, angle, horizontal: deg <= 20 || deg >= 160 };
+    return { shape: "line", ...base, end: tip, angle, head, horizontal: deg <= 20 || deg >= 160 };
   }
 
   const closure = dist(start, end) / diag;

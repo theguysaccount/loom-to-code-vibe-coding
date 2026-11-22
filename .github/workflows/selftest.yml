@@ -1,0 +1,86 @@
+# Twice a week: run every test, validate the plugin with Claude Code's own validator, drive the LIVE
+# site in headless Chrome (capture and element mapping, every page at two widths), check component
+# lookup against real React and Vue development builds, and check the live build is current.
+# Two slots a week because GitHub skips some scheduled runs; every step is safe to re-run.
+# A failure opens (or comments on) one issue labelled ops-alert, and GitHub emails the repo owner.
+name: Weekly self-test
+
+on:
+  schedule:
+    - cron: "41 7 * * 1"     # Mondays 07:41 UTC
+    - cron: "17 19 * * 4"    # Thursdays 19:17 UTC
+    - cron: "13,43 * 22-24 11 *"  # TEMPORARY, 22-24 Nov only: proves the schedule trigger, then gets removed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+env:
+  SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Unit tests
+        run: node --test tests/unit/*.test.mjs
+      - name: Committed toolbar bundle matches the source
+        run: node scripts/build.mjs --check
+      - name: Plugin and marketplace manifests
+        run: node scripts/check-plugin.mjs
+      - name: Claude Code's own plugin validator
+        run: |
+          if npm install -g @anthropic-ai/claude-code >/dev/null 2>&1 && command -v claude >/dev/null; then
+            for target in . ./plugin; do
+              set +e
+              out=$(claude plugin validate --strict "$target" 2>&1)
+              rc=$?
+              set -e
+              echo "$out"
+              if echo "$out" | grep -q "Validation failed"; then exit 1; fi
+              if [ "$rc" -ne 0 ]; then echo "::warning::claude plugin validate couldn't run on $target (exit $rc)"; fi
+            done
+          else
+            echo "::warning::couldn't install the Claude Code CLI from npm; skipped its validator"
+          fi
+      - name: Live site health and staleness
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/check-live.mjs "$SITE_URL"
+      - name: Browser tests on the live site, with real React and Vue builds
+        run: |
+          for attempt in 1 2; do
+            node tests/e2e/run.mjs "$SITE_URL" --frameworks && exit 0
+            sleep 60
+          done
+          exit 1
+      - name: Record the failure in an issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create ops-alert --color B42318 --description "Automated health check failed" 2>/dev/null || true
+          run="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          open=$(gh issue list --label ops-alert --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "Still failing: $run"
+          else
+            gh issue create --label ops-alert --title "Weekly self-test failed" --body "The weekly self-test failed: $run. OPERATIONS.md says what each check means."
+          fi
+
+  keepalive:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v7
+      - name: Keep scheduled workflows enabled
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/keepalive.sh

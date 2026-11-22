@@ -1,0 +1,85 @@
+# Test, build and deploy the site and the toolbar to GitHub Pages, then test the live site and ping IndexNow.
+# Fails safe: any failing test stops before the deploy, so the last good site stays live.
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # The one setting a custom domain changes (repository variable SITE_URL).
+  SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+  SPONSOR_URL: ${{ vars.SPONSOR_URL }}          # optional key: sponsor link in the footer
+  GOATCOUNTER_URL: ${{ vars.GOATCOUNTER_URL }}  # optional key: cookieless analytics
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Unit tests (shapes, brief, paths, plugin server)
+        run: node --test tests/unit/*.test.mjs
+      - name: Committed toolbar bundle matches the source
+        run: node scripts/build.mjs --check
+      - name: Plugin and marketplace manifests
+        run: node scripts/check-plugin.mjs
+      - name: Build
+        run: node scripts/build.mjs
+      - name: Browser tests (capture, element mapping, bridge hand-off, every page at two widths)
+        run: node tests/e2e/run.mjs
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+  after-deploy:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Wait until the live site serves this commit
+        run: |
+          for i in $(seq 1 30); do
+            live=$(curl -fsS "$SITE_URL/version.json?t=$(date +%s)" | sed -n 's/.*"commit": "\([0-9a-f]*\)".*/\1/p' || true)
+            [ "$live" = "$GITHUB_SHA" ] && echo "live: $live" && exit 0
+            sleep 20
+          done
+          echo "::warning::the CDN still served an older build after 10 minutes"
+      - name: Browser tests on the live site
+        run: |
+          for attempt in 1 2 3; do
+            node tests/e2e/run.mjs "$SITE_URL" && exit 0
+            sleep 60
+          done
+          exit 1
+      - name: Tell search engines (IndexNow)
+        run: |
+          node scripts/build.mjs >/dev/null
+          node scripts/indexnow.mjs dist/urls.txt

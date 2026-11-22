@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pointbrief framework self-test</title>
+</head>
+<body>
+<h1>Real framework self-test</h1>
+<p>Loads development builds of React and Vue from esm.sh and checks Pointbrief still finds the component behind an element. ?react=19 (default) or ?react=latest, ?vue=3.</p>
+<div id="react-root"></div>
+<div id="vue-root"></div>
+<script src="../pointbrief.js" data-manual></script>
+<script type="module">
+const params = new URLSearchParams(location.search);
+const reactVersion = params.get("react") || "19";
+const vueVersion = params.get("vue") || "3";
+const lines = [];
+let failed = 0, skipped = 0;
+const check = (ok, what) => { lines.push((ok ? "ok   " : "FAIL ") + what); if (!ok) failed++; };
+const skip = (what) => { lines.push("skip " + what); skipped++; };
+const tick = (ms) => new Promise((r) => setTimeout(r, ms));
+const PB = window.Pointbrief;
+
+try {
+  const React = await import(`https://esm.sh/react@${reactVersion}?dev`);
+  const ReactDOM = await import(`https://esm.sh/react-dom@${reactVersion}/client?dev&deps=react@${reactVersion}`);
+  const h = React.createElement;
+  function Hero() { return h("button", { id: "real-react", type: "button" }, "Real React"); }
+  function App() { return h("section", null, h(Hero)); }
+  ReactDOM.createRoot(document.getElementById("react-root")).render(h(App));
+  await tick(400);
+  const el = document.getElementById("real-react");
+  const info = el && PB.frameworkInfo(el);
+  lines.push(`     React ${React.version}: ${JSON.stringify(info)}`);
+  check(!!info && info.framework === "react", "React: element is recognised");
+  check(!!info && info.name === "Hero", "React: component name is Hero");
+  check(!!info && info.chain.includes("App"), "React: owner chain includes App");
+  check(!!info && /selftest\/frameworks\.html$/.test(info.file) && info.line > 0, "React: source location points at the JSX call site in this page");
+} catch (e) {
+  skip(`React ${reactVersion} couldn't load from esm.sh (${e.message})`);
+}
+
+try {
+  const Vue = await import(`https://esm.sh/vue@${vueVersion}/dist/vue.esm-browser.js`);
+  const PricingCard = { name: "PricingCard", template: '<button id="real-vue" type="button">Real Vue</button>' };
+  Vue.createApp({ name: "App", components: { PricingCard }, template: "<PricingCard />" }).mount("#vue-root");
+  await tick(200);
+  const el = document.getElementById("real-vue");
+  const info = el && PB.frameworkInfo(el);
+  lines.push(`     Vue ${Vue.version}: ${JSON.stringify(info)}`);
+  check(!!info && info.framework === "vue" && info.name === "PricingCard", "Vue: component name is PricingCard");
+  check(!!info && info.chain.join(">") === "App>PricingCard", "Vue: parent chain");
+} catch (e) {
+  skip(`Vue ${vueVersion} couldn't load from esm.sh (${e.message})`);
+}
+
+const pre = document.createElement("pre");
+pre.id = "selftest";
+pre.textContent = lines.join("\n");
+document.body.appendChild(pre);
+document.body.setAttribute("data-selftest", failed ? "fail" : skipped ? "skip" : "pass");
+</script>
+</body>
+</html>

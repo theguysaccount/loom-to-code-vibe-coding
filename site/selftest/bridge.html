@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pointbrief bridge self-test</title>
+<style>body{font:15px system-ui,sans-serif;margin:40px} button{font-size:18px;padding:10px 16px}</style>
+</head>
+<body>
+<h1>Bridge self-test</h1>
+<p>Records a short sample, then presses Send to agent and checks the local plugin received it. Run by tests/e2e/run.mjs with a temporary plugin server.</p>
+<button id="target-button" type="button">Make me bigger</button>
+<script src="../pointbrief.js" data-manual></script>
+<script>
+(function () {
+  "use strict";
+  var bridge = new URLSearchParams(location.search).get("bridge");
+  var lines = [], failed = 0;
+  function check(ok, what) { lines.push((ok ? "ok   " : "FAIL ") + what); if (!ok) failed++; }
+  function done() {
+    var pre = document.createElement("pre"); pre.id = "selftest"; pre.textContent = lines.join("\n");
+    document.body.appendChild(pre);
+    document.body.setAttribute("data-selftest", failed ? "fail" : "pass");
+  }
+  function waitFor(fn, ms) {
+    return new Promise(function (resolve) {
+      var end = Date.now() + ms;
+      (function tick() { var v = fn(); if (v || Date.now() > end) return resolve(v); setTimeout(tick, 100); })();
+    });
+  }
+  if (!bridge) { check(false, "no ?bridge= given"); return done(); }
+  var tb = window.Pointbrief.init({ bridge: bridge, coach: false });
+  window.Pointbrief.playSample([
+    { say: "make this button bigger", ms: 1400, async: true },
+    { hover: "#target-button", ms: 1600 },
+    { wait: "speech" }
+  ], { cursor: false }).then(function (brief) {
+    check(brief && brief.items.length === 1, "one item recorded");
+    var root = tb.host.shadowRoot;
+    return waitFor(function () { var b = root.querySelector('[data-act="send"]'); return b && !b.hidden ? b : null; }, 8000).then(function (btn) {
+      check(!!btn, "Send to agent appears when the bridge answers");
+      if (!btn) return;
+      btn.click();
+      return waitFor(function () { var s = root.querySelector(".status"); return s && /Sent to your agent as (\S+)\./.test(s.textContent) ? s.textContent : null; }, 8000).then(function (text) {
+        check(!!text, "the bridge accepted the brief: " + (text || "no confirmation"));
+        if (text) document.body.setAttribute("data-brief-id", text.match(/as (\S+)\./)[1]);
+      });
+    });
+  }).then(done, function (e) { check(false, "threw: " + e); done(); });
+})();
+</script>
+</body>
+</html>

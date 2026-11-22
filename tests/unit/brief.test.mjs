@@ -170,6 +170,7 @@ test("an arrow means move this to there", () => {
   const md = briefToMarkdown(b);
   assert.match(md, /Target \[1\] \(move this\), drew an arrow: `div\.promo`/);
   assert.match(md, /Target \[2\] \(to here\), drew an arrow: `footer\.site-footer`/);
+  assert.equal(b.items[0].saidMarked, undefined, "one gesture, so no [1] [2] markers in the words");
 });
 
 test("an arrow that starts and ends on one element just points at it", () => {

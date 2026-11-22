@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theguysaccount.github.io/loom-to-code-vibe-coding/brief.schema.json",
+  "title": "Pointbrief brief",
+  "description": "An element-mapped UI change list recorded with the Pointbrief toolbar (pointbrief/brief@1). Fields may be added within version 1; ignore fields you don't know.",
+  "type": "object",
+  "required": ["schema", "id", "createdAt", "app", "summary", "items"],
+  "properties": {
+    "schema": { "const": "pointbrief/brief@1" },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "app": {
+      "type": "object",
+      "properties": {
+        "origin": { "type": "string" },
+        "title": { "type": "string" },
+        "page": { "type": "string" },
+        "viewport": { "type": ["object", "null"], "properties": { "w": { "type": "integer" }, "h": { "type": "integer" } } },
+        "framework": { "type": ["string", "null"] }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["items"],
+      "properties": {
+        "items": { "type": "integer", "minimum": 0 },
+        "high": { "type": "integer", "minimum": 0 },
+        "seconds": { "type": "number", "minimum": 0 },
+        "voice": { "type": "string" }
+      }
+    },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "trail": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": { "t": { "type": "number" }, "kind": { "enum": ["nav", "click"] }, "label": { "type": "string" } }
+      }
+    },
+    "tool": { "type": "object", "properties": { "name": { "type": "string" }, "version": { "type": "string" } } }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["n", "said", "source", "priority", "targets"],
+      "properties": {
+        "n": { "type": "integer", "minimum": 1 },
+        "said": { "type": "string" },
+        "saidMarked": { "type": "string" },
+        "source": { "enum": ["speech", "typed", "gesture"] },
+        "t": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "page": { "type": "string" },
+        "priority": { "enum": ["high", "normal"] },
+        "why": { "type": "array", "items": { "type": "string" } },
+        "hints": { "type": "array", "items": { "enum": ["remove", "move", "copy", "style", "bug", "add"] } },
+        "targets": { "type": "array", "items": { "$ref": "#/$defs/target" } },
+        "resting": { "$ref": "#/$defs/element" }
+      }
+    },
+    "element": {
+      "type": "object",
+      "properties": {
+        "tag": { "type": "string" },
+        "id": { "type": "string" },
+        "classes": { "type": "array", "items": { "type": "string" } },
+        "selector": { "type": "string" },
+        "text": { "type": "string" },
+        "name": { "type": "string" },
+        "ariaRole": { "type": "string" },
+        "attrs": { "type": "object", "additionalProperties": { "type": "string" } },
+        "rect": { "type": "object", "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number" }, "h": { "type": "number" } } },
+        "styles": { "type": "object", "additionalProperties": { "type": "string" } },
+        "page": { "type": "string" },
+        "shadowHost": { "type": "string" },
+        "private": { "type": "boolean" },
+        "component": {
+          "type": "object",
+          "properties": {
+            "framework": { "type": "string" },
+            "name": { "type": "string" },
+            "chain": { "type": "array", "items": { "type": "string" } },
+            "file": { "type": "string" },
+            "line": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "target": {
+      "allOf": [{ "$ref": "#/$defs/element" }],
+      "type": "object",
+      "required": ["n", "role", "gesture"],
+      "properties": {
+        "n": { "type": "integer", "minimum": 1 },
+        "role": { "enum": ["target", "from", "to"] },
+        "gesture": { "type": "string" },
+        "gestureKind": { "type": "string" },
+        "gestureCount": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

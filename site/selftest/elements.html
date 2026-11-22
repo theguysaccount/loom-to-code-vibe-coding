@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pointbrief element-mapping self-test</title>
+<style>body{font:15px system-ui,sans-serif;margin:20px} section{margin:0 0 12px} .px-4{padding:0 16px}</style>
+</head>
+<body>
+<h1>Element-mapping self-test</h1>
+<p>Fixtures for the weekly test of how Pointbrief describes elements. Not a page for people.</p>
+
+<section id="utility">
+  <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+  <button class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+</section>
+<section>
+  <button id=":r1:">Generated id</button>
+  <button id="radix-12345">Radix id</button>
+  <button id="checkout">Stable id</button>
+  <a href="/pricing" data-testid="nav-pricing">Pricing</a>
+  <span class="Button_primary__a1B2c css-1x2y3z">Hashed classes</span>
+</section>
+<section id="inline-cases">
+  <button class="icon-btn" aria-label="Close dialog"><svg width="16" height="16" viewBox="0 0 16 16"><path id="close-path" d="M2 2l12 12M14 2 2 14" stroke="#000"/></svg></button>
+  <p class="lead">Read the <em id="emph">important</em> part.</p>
+  <a class="more" href="/docs/start"><span id="more-span">Read more</span></a>
+</section>
+<section>
+  <ul class="plain"><li>One</li><li>Two</li><li>Three</li><li>Four</li><li>Five</li></ul>
+</section>
+<section>
+  <div data-pointbrief-private><p class="balance">$1,234.56</p></div>
+  <label>Email <input name="email" type="email" value="secret-value@example.test"></label>
+  <input id="pw" type="password" value="hunter2-secret">
+</section>
+<section>
+  <div id="react-fake">React 19 component</div>
+  <div id="react-legacy">React 18 component</div>
+  <div id="vue-fake">Vue component</div>
+  <div id="svelte-fake">Svelte component</div>
+  <nav data-sentry-component="NavBar" data-sentry-source-file="NavBar.tsx"><a id="sentry-child" href="#x">Home</a></nav>
+  <div data-inspector-relative-path="src/widgets/Card.tsx" data-inspector-line="27"><span id="inspector-child">Card body</span></div>
+</section>
+<section><my-widget id="widget"></my-widget></section>
+
+<script src="../pointbrief.js" data-manual></script>
+<script>
+(function () {
+  "use strict";
+  var PB = window.Pointbrief;
+  var lines = [], failed = 0;
+  function check(ok, what) { lines.push((ok ? "ok   " : "FAIL ") + what); if (!ok) failed++; }
+  function unique(sel, el, root) { var r = root || document; try { var all = r.querySelectorAll(sel); return all.length === 1 && all[0] === el; } catch (e) { return false; } }
+  var $ = function (s) { return document.querySelector(s); };
+
+  // Shadow DOM component.
+  var host = $("#widget");
+  var sr = host.attachShadow({ mode: "open" });
+  sr.innerHTML = '<div class="card"><button class="buy">Buy</button><button class="buy">Buy again</button></div>';
+
+  // Fake React 19 fiber: no _debugSource, a _debugStack pointing at the JSX call site.
+  function Hero() {}
+  function App() {}
+  var appFiber = { type: App, _debugOwner: null, return: null };
+  var heroFiber = { type: Hero, _debugOwner: appFiber, return: appFiber };
+  $("#react-fake")["__reactFiber$abc123"] = { type: "div", _debugOwner: heroFiber, return: heroFiber,
+    _debugStack: { stack: "Error: react-stack-top-frame\n    at exports.jsxDEV (http://localhost:5173/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=1a2b:250:30)\n    at Hero (http://localhost:5173/src/components/Hero.tsx?t=1732000000:12:7)\n    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-ABCDEF12.js?v=1a2b:11548:26)" } };
+  // Fake React 18 fiber with _debugSource.
+  function Pricing() {}
+  $("#react-legacy")["__reactFiber$zz"] = { type: "div", _debugSource: { fileName: "/Users/someone/app/src/pages/Pricing.jsx", lineNumber: 33 },
+    _debugOwner: { type: Pricing, _debugOwner: null }, return: null };
+  // Fake Vue 3 instance.
+  $("#vue-fake").__vueParentComponent = { type: { __name: "PricingCard", __file: "/home/dev/shop/src/components/PricingCard.vue" },
+    parent: { type: { __name: "App", __file: "/home/dev/shop/src/App.vue" }, parent: null } };
+  // Fake Svelte meta.
+  $("#svelte-fake").__svelte_meta = { loc: { file: "src/routes/+page.svelte", line: 14, column: 2 } };
+
+  try {
+    var save = $("#utility button");
+    var sSave = PB.uniqueSelector(save);
+    check(unique(sSave, save), "utility-class button gets a unique selector: " + sSave);
+    check(!/bg-blue|px-4|rounded/.test(sSave), "utility classes stay out of the selector");
+    var gen = $('[id=":r1:"]'), radix = $("#radix-12345"), stable = $("#checkout");
+    check(PB.uniqueSelector(stable) === "#checkout", "a stable id is used as is");
+    check(!/:r1:/.test(PB.uniqueSelector(gen)) && unique(PB.uniqueSelector(gen), gen), "a React useId id is ignored: " + PB.uniqueSelector(gen));
+    check(!/radix/.test(PB.uniqueSelector(radix)) && unique(PB.uniqueSelector(radix), radix), "a Radix id is ignored: " + PB.uniqueSelector(radix));
+    check(PB.uniqueSelector($("[data-testid=nav-pricing]")) === '[data-testid="nav-pricing"]', "data-testid is preferred");
+    var hashed = $(".Button_primary__a1B2c");
+    check(!/Button_primary|css-1x2y3z/.test(PB.uniqueSelector(hashed)) && unique(PB.uniqueSelector(hashed), hashed), "CSS-module and emotion classes are ignored: " + PB.uniqueSelector(hashed));
+
+    check(PB.semanticTarget($("#close-path")) === $(".icon-btn"), "an icon inside a button means the button");
+    check(PB.semanticTarget($("#emph")) === $(".lead"), "an <em> inside a paragraph means the paragraph");
+    check(PB.semanticTarget($("#more-span")) === $(".more"), "a span inside a link means the link");
+    check(PB.semanticTarget(document.body) === null, "the page background is nothing");
+
+    var lis = document.querySelectorAll(".plain li");
+    var allUnique = true;
+    lis.forEach(function (li) { if (!unique(PB.uniqueSelector(li), li)) allUnique = false; });
+    check(allUnique, "list items without classes get unique selectors: " + PB.uniqueSelector(lis[3]));
+
+    var bal = PB.describeElement($(".balance"));
+    check(bal.private === true && bal.text === "", "text inside data-pointbrief-private is left out");
+    var email = PB.describeElement($("input[name=email]"));
+    var pw = PB.describeElement($("#pw"));
+    var dump = JSON.stringify([email, pw, bal]);
+    check(dump.indexOf("secret-value") < 0 && dump.indexOf("hunter2") < 0 && dump.indexOf("1,234") < 0, "form values and private text never appear");
+    check(pw.private === true, "password fields are private");
+    check(email.attrs.name === "email" && email.ariaRole === "textbox", "inputs keep their name and role");
+
+    var r19 = PB.frameworkInfo($("#react-fake"));
+    check(!!r19 && r19.framework === "react" && r19.name === "Hero", "React 19: component name from the owner chain (" + (r19 && r19.name) + ")");
+    check(!!r19 && r19.file === "src/components/Hero.tsx" && r19.line === 12, "React 19: source file and line from _debugStack (" + (r19 && r19.file + ":" + r19.line) + ")");
+    check(!!r19 && r19.chain.join(">") === "App>Hero", "React 19: owner chain (" + (r19 && r19.chain.join(">")) + ")");
+    var r18 = PB.frameworkInfo($("#react-legacy"));
+    check(!!r18 && r18.file === "src/pages/Pricing.jsx" && r18.line === 33 && r18.name === "Pricing", "React 18: _debugSource still works (" + (r18 && r18.file) + ")");
+    var vue = PB.frameworkInfo($("#vue-fake"));
+    check(!!vue && vue.name === "PricingCard" && vue.file === "src/components/PricingCard.vue" && vue.chain.join(">") === "App>PricingCard", "Vue 3: component and file (" + (vue && vue.file) + ")");
+    var sv = PB.frameworkInfo($("#svelte-fake"));
+    check(!!sv && sv.file === "src/routes/+page.svelte" && sv.line === 14, "Svelte: file and line from __svelte_meta (" + (sv && sv.file + ":" + sv.line) + ")");
+    var sentry = PB.frameworkInfo($("#sentry-child"));
+    check(!!sentry && sentry.name === "NavBar" && sentry.file === "NavBar.tsx", "Sentry component annotations (" + (sentry && sentry.name) + ")");
+    var insp = PB.frameworkInfo($("#inspector-child"));
+    check(!!insp && insp.file === "src/widgets/Card.tsx" && insp.line === 27, "react-dev-inspector annotations (" + (insp && insp.file) + ")");
+    check(PB.frameworkInfo($(".lead")) === null, "plain HTML has no component");
+
+    var buy = sr.querySelectorAll(".buy")[1];
+    var d = PB.describeElement(buy);
+    check(unique(d.selector, buy, sr), "inside a shadow root the selector is unique within it: " + d.selector);
+    check(d.shadowHost === "#widget", "the shadow host is recorded: " + d.shadowHost);
+
+    var desc = PB.describeElement(save);
+    check(desc.tag === "button" && desc.text === "Save" && desc.rect.w > 0 && desc.styles["font-size"], "describeElement has tag, text, rect and styles");
+    check(desc.ariaRole === "button", "implicit ARIA role");
+  } catch (err) {
+    check(false, "threw: " + (err && err.stack || err));
+  }
+  var pre = document.createElement("pre");
+  pre.id = "selftest";
+  pre.textContent = lines.join("\n");
+  document.body.appendChild(pre);
+  document.body.setAttribute("data-selftest", failed ? "fail" : "pass");
+})();
+</script>
+</body>
+</html>
